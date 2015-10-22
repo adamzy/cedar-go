@@ -1,7 +1,5 @@
 package cedar
 
-import "fmt"
-
 // Status reports the following statistics of the cedar:
 //	keys:		number of keys that are in the cedar,
 //	nodes:		number of trie nodes (slots in the base array) has been taken,
@@ -109,11 +107,9 @@ func (da *Cedar) Delete(key []byte) error {
 	// if the path does not exist, or the end is not a leaf, nothing to delete
 	to, err := da.Jump(key, 0)
 	if err != nil {
-		fmt.Println(err)
 		return ErrNoPath
 	}
 
-	// fmt.Println(1)
 	if da.Array[to].Value < 0 {
 		base := da.Array[to].base()
 		if da.Array[base].Check == to {
@@ -121,7 +117,6 @@ func (da *Cedar) Delete(key []byte) error {
 		}
 	}
 
-	// fmt.Println(2)
 	for {
 		from := da.Array[to].Check
 		base := da.Array[from].base()
