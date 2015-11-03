@@ -1,6 +1,6 @@
 package cedar
 
-const valueLimit = 1<<63 - 1
+const ValueLimit = int(^uint(0) >> 1)
 
 type node struct {
 	Value int
@@ -71,7 +71,7 @@ func New() *Cedar {
 // Get value by key, insert the key if not exist
 func (da *cedar) get(key []byte, from, pos int) *int {
 	for ; pos < len(key); pos++ {
-		if value := da.Array[from].Value; value >= 0 && value != valueLimit {
+		if value := da.Array[from].Value; value >= 0 && value != ValueLimit {
 			to := da.follow(from, 0)
 			da.Array[to].Value = value
 		}
@@ -187,7 +187,7 @@ func (da *cedar) popEnode(base int, label byte, from int) int {
 			da.transferBlock(bi, &da.BheadO, &da.BheadC)
 		}
 	}
-	n.Value = valueLimit
+	n.Value = ValueLimit
 	n.Check = from
 	if base < 0 {
 		da.Array[from].Value = -(e ^ int(label)) - 1
@@ -394,7 +394,7 @@ func (da *cedar) resolve(from_n, base_n int, label_n byte) int {
 		if !flag && to_ == to_pn {
 			da.pushSibling(from_n, to_pn^int(label_n), label_n, true)
 			da.Ninfos[to_].Child = 0
-			n_.Value = valueLimit
+			n_.Value = ValueLimit
 			n_.Check = from_n
 		} else {
 			da.pushEnode(to_)

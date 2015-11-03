@@ -79,9 +79,9 @@ func (da *Cedar) Value(id int) (value int, err error) {
 }
 
 // Insert adds a key-value pair into the cedar.
-// It will return ErrInvalidValue, if value < 0 or > 2<<63-2.
+// It will return ErrInvalidValue, if value < 0 or >= ValueLimit.
 func (da *Cedar) Insert(key []byte, value int) error {
-	if value < 0 || value >= valueLimit {
+	if value < 0 || value >= ValueLimit {
 		return ErrInvalidValue
 	}
 	p := da.get(key, 0, 0)
@@ -91,10 +91,10 @@ func (da *Cedar) Insert(key []byte, value int) error {
 
 // Update increases the value associated with the `key`.
 // The `key` will be inserted if it is not in the cedar.
-// It will return ErrInvalidValue, if the updated value < 0 or > 2<<63-2.
+// It will return ErrInvalidValue, if the updated value < 0 or >= ValueLimit.
 func (da *Cedar) Update(key []byte, value int) error {
 	p := da.get(key, 0, 0)
-	if *p+value < 0 || *p+value >= valueLimit {
+	if *p+value < 0 || *p+value >= ValueLimit {
 		return ErrInvalidValue
 	}
 	*p += value
