@@ -15,6 +15,8 @@ var (
 		"中国", "中国北京", "中国上海", "中国广州",
 		"中华", "中华文明", "中华民族", "中华人民共和国",
 		"this", "this is", "this is a sentence.",
+		//"t", "t.",
+		//"a",
 	}
 )
 
@@ -27,12 +29,29 @@ func loadTestData() {
 
 	// add the keys
 	for i, word := range words {
-		cd.Insert([]byte(word), i)
+		if err := cd.Insert([]byte(word), i); err != nil {
+			panic(err)
+		}
+	}
+
+	for _, word := range words {
+		if err := cd.Delete([]byte(word)); err != nil {
+			//if err := cd.Update([]byte(word), -i); err != nil {
+			panic(err)
+		}
+	}
+
+	for i, word := range words {
+		if err := cd.Update([]byte(word), i); err != nil {
+			panic(err)
+		}
 	}
 
 	// delete some keys
 	for i := 0; i < len(words); i += 4 {
-		cd.Delete([]byte(words[i]))
+		if err := cd.Delete([]byte(words[i])); err != nil {
+			panic(err)
+		}
 	}
 	return
 }

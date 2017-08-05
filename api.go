@@ -94,6 +94,14 @@ func (da *Cedar) Insert(key []byte, value int) error {
 // It will return ErrInvalidValue, if the updated value < 0 or >= ValueLimit.
 func (da *Cedar) Update(key []byte, value int) error {
 	p := da.get(key, 0, 0)
+
+	// key was not inserted
+	if *p == ValueLimit {
+		*p = value
+		return nil
+	}
+
+	// key was inserted before
 	if *p+value < 0 || *p+value >= ValueLimit {
 		return ErrInvalidValue
 	}
@@ -117,7 +125,7 @@ func (da *Cedar) Delete(key []byte) error {
 		}
 	}
 
-	for {
+	for to > 0 {
 		from := da.Array[to].Check
 		base := da.Array[from].base()
 		label := byte(to ^ base)

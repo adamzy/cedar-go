@@ -70,28 +70,40 @@ func TestLargeDict(t *testing.T) {
 			panic("large dict test fail: should not exist")
 		}
 	}
+	checkSize := func(exp int) {
+		if keys, _, _, _ := trie.Status(); keys != exp {
+			panic("not correct status")
+		}
+	}
 
 	// Insert the first half of the dict.
 	for i := 0; i < size/2; i++ {
 		item := dict[i]
-		trie.Insert(item.key, item.value)
+		if i%2 == 0 {
+			if err := trie.Insert(item.key, item.value); err != nil {
+				panic(err)
+			}
+		} else {
+			if err := trie.Update(item.key, item.value); err != nil {
+				panic(err)
+			}
+		}
 	}
+	checkSize(size / 2)
+
 	// Check the first half of the dict.
 	for i := 0; i < size/2; i++ {
 		exist(i)
 	}
 	log.Println("first half OK")
 
-	// fmt.Println(trie.Get(dict[0].key))
-	// fmt.Println(trie.Delete(dict[0].key))
-	// fmt.Println(trie.Get(dict[0].key))
-	// notExist(0)
-
 	// Delete even items in the first half.
 	for i := 0; i < size/2; i += 2 {
 		err := trie.Delete(dict[i].key)
 		failIfError(err)
 	}
+	checkSize(size / 2 / 2)
+
 	// Make sure even items were deleted, and the rest are fine.
 	for i := 0; i < size/2; i++ {
 		if i%2 == 0 {
@@ -107,6 +119,8 @@ func TestLargeDict(t *testing.T) {
 		item := dict[i]
 		trie.Insert(item.key, item.value)
 	}
+	checkSize(size/2/2 + (size - size/2))
+
 	for i := 0; i < size/2; i++ {
 		if i%2 == 0 {
 			notExist(i)
@@ -136,11 +150,12 @@ func TestLargeDict(t *testing.T) {
 	log.Println("odd OK")
 
 	// Insert all even terms.
-	for i := 1; i < size; i += 2 {
+	for i := 0; i < size; i += 2 {
 		item := dict[i]
-		trie.Insert([]byte(item.key), item.value)
+		notExist(i)
+		trie.Update([]byte(item.key), item.value)
 	}
-	for i := 1; i < size; i += 2 {
+	for i := 0; i < size; i += 1 {
 		exist(i)
 	}
 	log.Println("all OK")
