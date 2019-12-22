@@ -237,6 +237,10 @@ func (da *cedar) pushSibling(from, base int, label byte, hasChild bool) {
 			c = &da.Ninfos[base^int(*c)].Sibling
 		}
 	}
+	// children must be different
+	if *c == label {
+		return
+	}
 	da.Ninfos[base^int(label)].Sibling = *c
 	*c = label
 }
